@@ -1,3 +1,11 @@
+# Frontend
+you can find the link for frontend in react here : https://github.com/OsamaRagab4004/flowna
+the deployed version here : https://app.flowna.io/
+username : cmsproject4400@gmail.com
+password : Code123456
+
+
+
 # Spring Boot 3.0 Security with JWT Implementation
 This project demonstrates the implementation of security using Spring Boot 3.0 and JSON Web Tokens (JWT). It includes the following features:
 
@@ -8,15 +16,8 @@ This project demonstrates the implementation of security using Spring Boot 3.0 a
 * Customized access denied handling
 * Logout mechanism
 * Refresh token
-
-## Technologies
-* Spring Boot 3.0
-* Spring Security
-* JSON Web Tokens (JWT)
-* BCrypt
-* Maven
-
-  
+* Email Verfication mechanism
+* Auth with google account
 
  Workspace: Collecting workspace information# Flowna - Study App Documentation
 
@@ -37,6 +38,14 @@ Intelligent Content Generation
         Q&A sessions
         Step-by-step guides
     Lecture Management: Access pre-generated study materials by lecture ID
+
+
+## Technologies
+* Spring Boot 3.0
+* Spring Security
+* JSON Web Tokens (JWT)
+* BCrypt
+* Maven
 
 
 
