@@ -1,0 +1,40 @@
+
+services:
+  # Service 1: Your Spring Boot Application
+  app:
+    build: .  # This tells Docker Compose to build the image from the Dockerfile in the current directory
+    container_name: flowna
+    ports:
+      - "8080:8080" # Map host port 8080 to container port 8080
+    networks:
+      - my-network
+    depends_on:
+      - postgres # Tells your app to wait for the postgres service to be ready
+    environment:
+      # Pass the database URL to your Spring Boot app
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/jwt_security
+      - SPRING_DATASOURCE_USERNAME=username
+      - SPRING_DATASOURCE_PASSWORD=password
+      # This ensures Hibernate creates/updates tables on startup
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create
+
+  # Service 2: The PostgreSQL Database
+  postgres:
+    image: postgres:14 # Use an official, specific version
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: jwt_security
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data # This is how your data is saved!
+    ports:
+      - "5432:5432" # Optional: for connecting from your local machine with a DB tool
+    networks:
+      - my-network
+
+volumes:
+  postgres-data: # Defines the named volume for persistent data
+
+networks:
+  my-network: # Defines the shared network

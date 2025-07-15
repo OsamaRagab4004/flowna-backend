@@ -1,0 +1,74 @@
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Component;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+
+import java.util.Map; // For session attributes
+import java.util.concurrent.ConcurrentHashMap; // Example for storing room info
+
+@Component
+public class WebSocketEventListener {
+
+    // Example: A simple way to track users in rooms (you'd likely have a more robust service)
+    private static final Map<String, String> userRoomMap = new ConcurrentHashMap<>(); // <sessionId, roomId>
+    private static final Map<String, Set<String>> roomUsersMap = new ConcurrentHashMap<>(); // <roomId, Set<sessionId>>
+
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate; // To send messages to clients
+
+    @EventListener
+    public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
+        SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.wrap(event.getMessage());
+        String sessionId = headerAccessor.getSessionId();
+
+        // Retrieve user and room information stored during connection/join
+        // This depends on how you store this info. Often, it's in session attributes
+        // or a dedicated service.
+        String username = (String) headerAccessor.getSessionAttributes().get("username");
+        String roomId = (String) headerAccessor.getSessionAttributes().get("roomId"); // Assuming you stored this
+
+        if (username != null) {
+            System.out.println("User Disconnected: " + username + " (Session: " + sessionId + ")");
+
+            if (roomId != null) {
+                System.out.println("User " + username + " disconnected from room: " + roomId);
+
+                // 1. Remove user from your room tracking logic
+                // This is a simplified example. You'd have a more robust RoomService.
+                if (roomUsersMap.containsKey(roomId)) {
+                    roomUsersMap.get(roomId).remove(sessionId);
+                    if (roomUsersMap.get(roomId).isEmpty()) {
+                        roomUsersMap.remove(roomId);
+                        System.out.println("Room " + roomId + " is now empty and removed.");
+                    }
+                }
+                userRoomMap.remove(sessionId);
+
+
+                // 2. Notify other users in the room that this user has left
+                String leaveMessage = username + " has left the room.";
+                // The destination would be something like "/topic/room/{roomId}/events"
+                // or "/topic/room/{roomId}/users"
+                messagingTemplate.convertAndSend("/topic/room/" + roomId + "/presence",
+                        Map.of("type", "USER_LEFT", "username", username, "message", leaveMessage));
+
+                // You might also want to send an updated user list to the room
+                // messagingTemplate.convertAndSend("/topic/room/" + roomId + "/users", getUsersInRoom(roomId));
+            }
+        } else {
+            System.out.println("Anonymous user disconnected: " + sessionId);
+            // Handle anonymous disconnects if necessary
+        }
+    }
+
+    // Example helper (you'd put this in a RoomService)
+    // private Set<String> getUsersInRoom(String roomId) {
+    //    return roomUsersMap.getOrDefault(roomId, Collections.emptySet())
+    //            .stream()
+    //            .map(sessionId -> (String) SimpMessageHeaderAccessor.getSessionAttributes(sessionId).get("username")) // This is tricky, session attributes might not be directly accessible like this post-disconnect for others
+    //            .collect(Collectors.toSet());
+    // }
+}

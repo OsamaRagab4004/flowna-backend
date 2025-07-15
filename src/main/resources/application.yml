@@ -1,0 +1,82 @@
+spring:
+  threads:
+    virtual:
+      enabled: true
+  servlet:
+    multipart:
+      max-file-size: 15MB
+      max-request-size: 15MB
+  mvc:
+      async:
+        request-timeout: 600000 # 10 minutes
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username:
+    password:
+    properties:
+      mail.smtp:
+        auth: true
+        starttls.enable: true
+        starttls.required: true
+        connection-timeout: 5000
+        timeout: 5000
+        write-timeout: 5000
+  datasource:
+    url:
+    username:
+    password:
+    driver-class-name:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+application:
+  security:
+    jwt:
+      secret-key:
+      expiration: 604800000 # a day
+      refresh-token:
+        expiration: 604800000 # 7 days
+    google:
+      id:
+api:
+  stripe:
+    key:
+
+
+openai:
+  api:
+    key:
+
+gemini:
+  api:
+    key:
+
+
+
+logging:
+  file:
+    name: logs/application.log
+  level:
+    root: INFO
+
+
+# Set maximum file size to 25MB
+
+
+#resilience4j:
+ # retry:
+  #  instances:
+   #   geminiServiceRetry:
+    #    max-attempts: 3
+     #   wait-duration: 1000ms
+      #  retry-exceptions:
+       #   - java.io.IOException
+        #  - java.net.http.HttpTimeoutException
+         # - com.flowna.app.Agents.Gemini.GeminiRateLimitException
